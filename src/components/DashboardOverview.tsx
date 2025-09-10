@@ -1,59 +1,71 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Transaction, Budget } from '@/types/finance';
-import { formatCurrency, getCurrentMonth } from '@/lib/finance-utils';
+import { Card, CardContent } from "../components/ui/card";
+import type { Transaction } from "../types/finance";
+// import { Budget } from "../types/finance";
+import { formatCurrency, getCurrentMonth } from "../lib/finance-utils";
+import { TransactionForm } from "./TransactionForm";
+import { useTransactions } from "../hooks/useTransaction";
 
 interface DashboardOverviewProps {
   transactions: Transaction[];
-  budgets: Budget[];
+  // budgets: Budget[];
 }
 
-export const DashboardOverview = ({ transactions, budgets }: DashboardOverviewProps) => {
+export const DashboardOverview = ({
+  transactions,
+}: // budgets,
+DashboardOverviewProps) => {
   const currentMonth = getCurrentMonth();
-  
-  const currentMonthTransactions = transactions.filter(t => 
-    new Date(t.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) === currentMonth
+  const { addTransaction } = useTransactions();
+  const currentMonthTransactions = transactions.filter(
+    (t) =>
+      new Date(t.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+      }) === currentMonth
   );
 
   const totalIncome = currentMonthTransactions
-    .filter(t => t.type === 'income')
+    .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
 
-  const totalExpenses = Math.abs(currentMonthTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0));
+  const totalExpenses = Math.abs(
+    currentMonthTransactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + t.amount, 0)
+  );
 
   const openingBalance = 5000; // Mock data similar to reference
   const closingBalance = openingBalance + totalIncome - totalExpenses;
 
   const overviewCards = [
     {
-      title: 'Opening Balance',
+      title: "Opening Balance",
       value: openingBalance,
-      subtitle: 'Balance at the beginning of the month',
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
-      textColor: 'text-gray-900 dark:text-white'
+      subtitle: "Balance at the beginning of the month",
+      bgColor: "bg-gray-50 dark:bg-gray-800",
+      textColor: "text-gray-900 dark:text-white",
     },
     {
-      title: 'Total Income',
+      title: "Total Income",
       value: totalIncome,
-      subtitle: 'Sum of all incoming funds',
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
-      textColor: 'text-gray-900 dark:text-white'
+      subtitle: "Sum of all incoming funds",
+      bgColor: "bg-gray-50 dark:bg-gray-800",
+      textColor: "text-gray-900 dark:text-white",
     },
     {
-      title: 'Total Expenses',
+      title: "Total Expenses",
       value: totalExpenses,
-      subtitle: 'Sum of all outgoing funds',
-      bgColor: 'bg-blue-500 dark:bg-blue-600',
-      textColor: 'text-white'
+      subtitle: "Sum of all outgoing funds",
+      bgColor: "bg-blue-500 dark:bg-blue-600",
+      textColor: "text-white",
     },
     {
-      title: 'Closing Balance',
+      title: "Closing Balance",
       value: closingBalance,
-      subtitle: 'Balance on the last day',
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
-      textColor: 'text-gray-900 dark:text-white'
-    }
+      subtitle: "Balance on the last day",
+      bgColor: "bg-gray-50 dark:bg-gray-800",
+      textColor: "text-gray-900 dark:text-white",
+    },
   ];
 
   return (
@@ -67,11 +79,16 @@ export const DashboardOverview = ({ transactions, budgets }: DashboardOverviewPr
       </Card>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        {overviewCards.map((card, index) => (
-          <Card key={card.title} className={`${card.bgColor} border-0 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
+        {overviewCards.map((card) => (
+          <Card
+            key={card.title}
+            className={`${card.bgColor} border-0 shadow-sm hover:shadow-md transition-shadow duration-200`}
+          >
             <CardContent className="p-6">
-              <h3 className={`text-sm font-medium ${card.textColor} opacity-80 mb-2`}>
+              <h3
+                className={`text-sm font-medium ${card.textColor} opacity-80 mb-2`}
+              >
                 {card.title}
               </h3>
               <p className={`text-3xl font-bold ${card.textColor} mb-2`}>
@@ -83,6 +100,9 @@ export const DashboardOverview = ({ transactions, budgets }: DashboardOverviewPr
             </CardContent>
           </Card>
         ))}
+        <div className="space-y-4 ">
+          <TransactionForm onSubmit={addTransaction} />
+        </div>
       </div>
     </div>
   );

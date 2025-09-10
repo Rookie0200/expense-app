@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Transaction, Budget } from '@/types/finance';
-import { generateId } from '@/lib/finance-utils';
+import type { Transaction, Budget } from '../types/finance';
+import { generateId } from '../lib/finance-utils';
 
 // Enhanced mock data for demonstration
 const mockTransactions: Transaction[] = [

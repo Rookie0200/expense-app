@@ -1,37 +1,59 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Budget, Transaction, CATEGORIES } from '@/types/finance';
-import { getBudgetVsActual, formatCurrency, getCurrentMonth } from '@/lib/finance-utils';
-import { toast } from '@/hooks/use-toast';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
+import { Badge } from "../components/ui/badge";
+import { Progress } from "../components/ui/progress";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import type { Budget, Transaction } from "../types/finance";
+import { CATEGORIES } from "../types/finance";
+import {
+  getBudgetVsActual,
+  formatCurrency,
+  getCurrentMonth,
+} from "../lib/finance-utils";
+import { toast } from "../hooks/use-toast";
 
 interface BudgetManagerProps {
   budgets: Budget[];
   transactions: Transaction[];
-  onAddBudget: (budget: Omit<Budget, 'id'>) => void;
+  onAddBudget: (budget: Omit<Budget, "id">) => void;
   onUpdateBudget: (id: string, updates: Partial<Budget>) => void;
   onDeleteBudget: (id: string) => void;
 }
 
-export const BudgetManager = ({ 
-  budgets, 
-  transactions, 
-  onAddBudget, 
-  onUpdateBudget, 
-  onDeleteBudget 
+export const BudgetManager = ({
+  budgets,
+  transactions,
+  onAddBudget,
+  onUpdateBudget,
+  onDeleteBudget,
 }: BudgetManagerProps) => {
   const [open, setOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [formData, setFormData] = useState({
-    category: '',
-    amount: '',
+    category: "",
+    amount: "",
     month: getCurrentMonth(),
   });
 
@@ -40,7 +62,7 @@ export const BudgetManager = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.category || !formData.amount) {
       toast({
         title: "Error",
@@ -72,7 +94,7 @@ export const BudgetManager = ({
 
     setOpen(false);
     setEditingBudget(null);
-    setFormData({ category: '', amount: '', month: getCurrentMonth() });
+    setFormData({ category: "", amount: "", month: getCurrentMonth() });
   };
 
   const handleEdit = (budget: Budget) => {
@@ -93,18 +115,34 @@ export const BudgetManager = ({
     });
   };
 
-  const getStatusColor = (status: 'under' | 'over' | 'on-track') => {
+  const getStatusColor = (status: "under" | "over" | "on-track") => {
     switch (status) {
-      case 'over': return 'bg-red-500';
-      case 'under': return 'bg-green-500';
-      default: return 'bg-blue-500';
+      case "over":
+        return "bg-red-500";
+      case "under":
+        return "bg-green-500";
+      default:
+        return "bg-blue-500";
     }
   };
 
-  const getStatusBadge = (status: 'under' | 'over' | 'on-track', percentage: number) => {
-    const variant = status === 'over' ? 'destructive' : status === 'under' ? 'default' : 'secondary';
-    const text = status === 'over' ? 'Over Budget' : status === 'under' ? 'Under Budget' : 'On Track';
-    
+  const getStatusBadge = (
+    status: "under" | "over" | "on-track",
+    percentage: number
+  ) => {
+    const variant =
+      status === "over"
+        ? "destructive"
+        : status === "under"
+        ? "default"
+        : "secondary";
+    const text =
+      status === "over"
+        ? "Over Budget"
+        : status === "under"
+        ? "Under Budget"
+        : "On Track";
+
     return (
       <Badge variant={variant} className="ml-2">
         {text} ({percentage.toFixed(0)}%)
@@ -129,7 +167,7 @@ export const BudgetManager = ({
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingBudget ? 'Edit Budget' : 'Add New Budget'}
+                  {editingBudget ? "Edit Budget" : "Add New Budget"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,7 +175,9 @@ export const BudgetManager = ({
                   <Label htmlFor="category">Category</Label>
                   <Select
                     value={formData.category}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, category: value }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
@@ -159,7 +199,12 @@ export const BudgetManager = ({
                     step="0.01"
                     placeholder="0.00"
                     value={formData.amount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        amount: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -167,12 +212,17 @@ export const BudgetManager = ({
                   <Input
                     id="month"
                     value={formData.month}
-                    onChange={(e) => setFormData(prev => ({ ...prev, month: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        month: e.target.value,
+                      }))
+                    }
                     disabled={!!editingBudget}
                   />
                 </div>
                 <Button type="submit" className="w-full">
-                  {editingBudget ? 'Update Budget' : 'Add Budget'}
+                  {editingBudget ? "Update Budget" : "Add Budget"}
                 </Button>
               </form>
             </DialogContent>
@@ -182,18 +232,30 @@ export const BudgetManager = ({
           {budgetVsActual.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">💰</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No budgets set</h3>
-              <p className="text-gray-500">Start by adding your first budget above.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No budgets set
+              </h3>
+              <p className="text-gray-500">
+                Start by adding your first budget above.
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
               {budgetVsActual.map((item) => {
-                const budget = budgets.find(b => b.category === item.category && b.month === currentMonth);
+                const budget = budgets.find(
+                  (b) =>
+                    b.category === item.category && b.month === currentMonth
+                );
                 return (
-                  <div key={item.category} className="p-4 bg-white/70 rounded-lg border border-gray-200">
+                  <div
+                    key={item.category}
+                    className="p-4 bg-white/70 rounded-lg border border-gray-200"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center">
-                        <h4 className="font-semibold text-gray-900">{item.category}</h4>
+                        <h4 className="font-semibold text-gray-900">
+                          {item.category}
+                        </h4>
                         {getStatusBadge(item.status, item.percentage)}
                       </div>
                       <div className="flex items-center space-x-2">
@@ -218,13 +280,18 @@ export const BudgetManager = ({
                         <span>Spent: {formatCurrency(item.actual)}</span>
                         <span>Budget: {formatCurrency(item.budget)}</span>
                       </div>
-                      <Progress 
-                        value={Math.min(item.percentage, 100)} 
+                      <Progress
+                        value={Math.min(item.percentage, 100)}
                         className={`h-2 ${getStatusColor(item.status)}`}
                       />
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>{item.percentage.toFixed(1)}% used</span>
-                        <span>{formatCurrency(Math.max(0, item.budget - item.actual))} remaining</span>
+                        <span>
+                          {formatCurrency(
+                            Math.max(0, item.budget - item.actual)
+                          )}{" "}
+                          remaining
+                        </span>
                       </div>
                     </div>
                   </div>

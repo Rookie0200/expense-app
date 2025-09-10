@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Budget, Transaction } from '@/types/finance';
-import { getBudgetVsActual, formatCurrency, getCurrentMonth } from '@/lib/finance-utils';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type TooltipProps } from 'recharts';
+import type { Budget, Transaction } from '../types/finance';
+import { getBudgetVsActual, formatCurrency, getCurrentMonth } from '../lib/finance-utils';
+import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface BudgetChartProps {
   budgets: Budget[];
@@ -12,14 +13,14 @@ export const BudgetChart = ({ budgets, transactions }: BudgetChartProps) => {
   const currentMonth = getCurrentMonth();
   const budgetData = getBudgetVsActual(transactions, budgets, currentMonth);
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType,NameType>) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry , index) => (
             <p key={index} style={{ color: entry.color }} className="font-medium">
-              {entry.name}: {formatCurrency(entry.value)}
+              {entry.name}: {formatCurrency(entry.value as number)}
             </p>
           ))}
         </div>
