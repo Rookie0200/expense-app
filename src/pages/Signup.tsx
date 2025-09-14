@@ -1,18 +1,31 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, CircleDollarSign, Loader2, CheckCircle } from 'lucide-react';
-import { useToast } from '../hooks/use-toast';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  Eye,
+  EyeOff,
+  CircleDollarSign,
+  Loader2,
+  CheckCircle,
+} from "lucide-react";
+import { useToast } from "../hooks/use-toast";
 
 export default function Signup() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +35,7 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast({
         title: "Passwords don't match",
@@ -44,8 +57,8 @@ export default function Signup() {
     setIsSubmitting(true);
 
     try {
-      await signup(email, password, name);
-      navigate('/');
+      await signup(email, password, firstName, lastName);
+      navigate("/");
       toast({
         title: "Account created successfully!",
         description: "Welcome to your financial dashboard.",
@@ -53,7 +66,8 @@ export default function Signup() {
     } catch (error) {
       toast({
         title: "Signup failed",
-        description: error instanceof Error ? error.message : "Please try again",
+        description:
+          error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
       });
     } finally {
@@ -62,8 +76,11 @@ export default function Signup() {
   };
 
   const passwordRequirements = [
-    { text: 'At least 6 characters', met: password.length >= 6 },
-    { text: 'Passwords match', met: password === confirmPassword && password.length > 0 },
+    { text: "At least 6 characters", met: password.length >= 6 },
+    {
+      text: "Passwords match",
+      met: password === confirmPassword && password.length > 0,
+    },
   ];
 
   return (
@@ -87,26 +104,41 @@ export default function Signup() {
         {/* Signup Form */}
         <Card className="border-0 shadow-2xl animate-fade-in">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl font-semibold">Create account</CardTitle>
+            <CardTitle className="text-2xl font-semibold">
+              Create account
+            </CardTitle>
             <CardDescription>
               Fill in your details to get started with your financial dashboard
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="transition-all duration-200 focus:scale-[1.01]"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="Enter your first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Enter your last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
+                </div>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -119,13 +151,13 @@ export default function Signup() {
                   className="transition-all duration-200 focus:scale-[1.01]"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Create a password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -153,7 +185,7 @@ export default function Signup() {
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -179,14 +211,22 @@ export default function Signup() {
               {/* Password Requirements */}
               {password && (
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Password Requirements:</Label>
+                  <Label className="text-xs text-muted-foreground">
+                    Password Requirements:
+                  </Label>
                   <div className="space-y-1">
                     {passwordRequirements.map((req, index) => (
                       <div key={index} className="flex items-center space-x-2">
-                        <CheckCircle 
-                          className={`h-3 w-3 ${req.met ? 'text-green-500' : 'text-muted-foreground'}`} 
+                        <CheckCircle
+                          className={`h-3 w-3 ${
+                            req.met ? "text-green-500" : "text-muted-foreground"
+                          }`}
                         />
-                        <span className={`text-xs ${req.met ? 'text-green-500' : 'text-muted-foreground'}`}>
+                        <span
+                          className={`text-xs ${
+                            req.met ? "text-green-500" : "text-muted-foreground"
+                          }`}
+                        >
                           {req.text}
                         </span>
                       </div>
@@ -195,8 +235,8 @@ export default function Signup() {
                 </div>
               )}
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
                 disabled={isSubmitting}
               >
@@ -206,16 +246,16 @@ export default function Signup() {
                     Creating account...
                   </>
                 ) : (
-                  'Create account'
+                  "Create account"
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Link 
-                  to="/login" 
+                Already have an account?{" "}
+                <Link
+                  to="/login"
                   className="font-medium text-primary hover:underline transition-colors duration-200"
                 >
                   Sign in here

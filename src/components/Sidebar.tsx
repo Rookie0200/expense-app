@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { Button } from "../components/ui/button";
-import {
-  BarChart3,
-  PieChart,
-  Menu,
-  X,
-  CircleDollarSign,
-  Activity,
-} from "lucide-react";
+import { BarChart3, Menu, X, CircleDollarSign, Activity } from "lucide-react";
 
 interface SidebarProps {
   activeSection: string;
@@ -19,7 +12,6 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
-    { id: "analytics", label: "Analytics", icon: PieChart },
     { id: "transactions", label: "Transactions", icon: Activity },
   ];
   return (

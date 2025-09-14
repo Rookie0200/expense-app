@@ -3,8 +3,6 @@ import { TransactionForm } from "../components/TransactionForm";
 import { TransactionList } from "../components/TransactionList";
 import { MonthlyChart } from "../components/MonthlyChart";
 import { CategoryChart } from "../components/CategoryChart";
-import { BudgetChart } from "../components/BudgetChart";
-import { StatsCards } from "../components/StatsCards";
 import { Sidebar } from "../components/Sidebar";
 import { DashboardHeader } from "../components/DashboardHeader";
 import { DashboardOverview } from "../components/DashboardOverview";
@@ -15,7 +13,6 @@ const Index = () => {
 
   const {
     transactions,
-    budgets,
     loading,
     addTransaction,
     updateTransaction,
@@ -34,18 +31,6 @@ const Index = () => {
                 <CategoryChart transactions={transactions} />
               </div>
             </div>
-          </div>
-        );
-
-      case "analytics":
-        return (
-          <div className="p-6 space-y-6">
-            <StatsCards transactions={transactions} budgets={budgets} />
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <MonthlyChart transactions={transactions} />
-              <CategoryChart transactions={transactions} />
-            </div>
-            <BudgetChart budgets={budgets} transactions={transactions} />
           </div>
         );
 
@@ -73,8 +58,6 @@ const Index = () => {
     switch (activeSection) {
       case "dashboard":
         return "Dashboard";
-      case "analytics":
-        return "Analytics";
       case "transactions":
         return "Transactions";
       default:

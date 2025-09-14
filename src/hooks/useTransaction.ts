@@ -1,100 +1,7 @@
-import { useState, useEffect } from 'react';
-import type { Transaction, Budget } from '../types/finance';
-import { generateId } from '../lib/finance-utils';
-
-// Enhanced mock data for demonstration
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    amount: -120.50,
-    description: 'Grocery shopping at Whole Foods',
-    date: '2024-07-01',
-    type: 'expense',
-    category: 'Food'
-  },
-  {
-    id: '2',
-    amount: 3500,
-    description: 'Monthly Salary',
-    date: '2024-07-01',
-    type: 'income'
-  },
-  {
-    id: '3',
-    amount: -85,
-    description: 'Electricity Bill',
-    date: '2024-06-28',
-    type: 'expense',
-    category: 'Bills'
-  },
-  {
-    id: '4',
-    amount: -45.30,
-    description: 'Coffee and lunch',
-    date: '2024-07-02',
-    type: 'expense',
-    category: 'Food'
-  },
-  {
-    id: '5',
-    amount: -200,
-    description: 'Monthly gym membership',
-    date: '2024-06-15',
-    type: 'expense',
-    category: 'Healthcare'
-  },
-  {
-    id: '6',
-    amount: -75,
-    description: 'Gas for car',
-    date: '2024-07-03',
-    type: 'expense',
-    category: 'Transport'
-  },
-  {
-    id: '7',
-    amount: -150,
-    description: 'New shoes',
-    date: '2024-07-05',
-    type: 'expense',
-    category: 'Shopping'
-  },
-  {
-    id: '8',
-    amount: -25,
-    description: 'Movie tickets',
-    date: '2024-07-06',
-    type: 'expense',
-    category: 'Entertainment'
-  },
-  {
-    id: '9',
-    amount: -300,
-    description: 'Online course',
-    date: '2024-06-20',
-    type: 'expense',
-    category: 'Education'
-  },
-  {
-    id: '10',
-    amount: -90,
-    description: 'Restaurant dinner',
-    date: '2024-07-07',
-    type: 'expense',
-    category: 'Food'
-  }
-];
-
-const mockBudgets: Budget[] = [
-  { id: '1', category: 'Food', amount: 400, month: 'Jul 2024' },
-  { id: '2', category: 'Bills', amount: 300, month: 'Jul 2024' },
-  { id: '3', category: 'Transport', amount: 200, month: 'Jul 2024' },
-  { id: '4', category: 'Shopping', amount: 250, month: 'Jul 2024' },
-  { id: '5', category: 'Entertainment', amount: 100, month: 'Jul 2024' },
-  { id: '6', category: 'Healthcare', amount: 150, month: 'Jul 2024' },
-  { id: '7', category: 'Education', amount: 200, month: 'Jul 2024' },
-  { id: '8', category: 'Other', amount: 100, month: 'Jul 2024' },
-];
+import { useState, useEffect } from "react";
+import type { Transaction, Budget } from "../types/finance";
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+import axios from "axios";
 
 export const useTransactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -102,55 +9,101 @@ export const useTransactions = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call
     const loadData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setTransactions(mockTransactions);
-      setBudgets(mockBudgets);
+      setLoading(true);
+      try {
+        // Fetch transactions
+        const txRes = await axios.get(`${BACKEND_URL}/api/transactions`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        setTransactions(txRes.data);
+
+        // Fetch budgets
+        const budgetRes = await axios.get(`${BACKEND_URL}/api/budgets`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        setBudgets(budgetRes.data);
+      } catch (err) {
+        setTransactions([]);
+        setBudgets([]);
+      }
       setLoading(false);
     };
-
     loadData();
   }, []);
-
-  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
-    const newTransaction = {
-      ...transaction,
-      id: generateId(),
-    };
-    setTransactions(prev => [newTransaction, ...prev]);
+console.log(transactions);
+  const addTransaction = async (transaction: Omit<Transaction, "id">) => {
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/api/transactions`,
+        transaction,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setTransactions((prev) => [res.data, ...prev]);
+    } catch (err) {}
   };
 
-  const updateTransaction = (id: string, updates: Partial<Transaction>) => {
-    setTransactions(prev =>
-      prev.map(transaction =>
-        transaction.id === id ? { ...transaction, ...updates } : transaction
-      )
-    );
+  const updateTransaction = async (
+    id: string,
+    updates: Partial<Transaction>
+  ) => {
+    try {
+      const res = await axios.put(
+        `${BACKEND_URL}/api/transactions/${id}`,
+        updates,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setTransactions((prev) =>
+        prev.map((transaction) =>
+          transaction.id === id ? res.data : transaction
+        )
+      );
+    } catch (err) {}
   };
 
-  const deleteTransaction = (id: string) => {
-    setTransactions(prev => prev.filter(transaction => transaction.id !== id));
+  const deleteTransaction = async (id: string) => {
+    try {
+      await axios.delete(`${BACKEND_URL}/api/transactions/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setTransactions((prev) =>
+        prev.filter((transaction) => transaction.id !== id)
+      );
+    } catch (err) {}
   };
 
-  const addBudget = (budget: Omit<Budget, 'id'>) => {
-    const newBudget = {
-      ...budget,
-      id: generateId(),
-    };
-    setBudgets(prev => [...prev, newBudget]);
+  const addBudget = async (budget: Omit<Budget, "id">) => {
+    try {
+      const res = await axios.post(`${BACKEND_URL}/api/budgets`, budget, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setBudgets((prev) => [...prev, res.data]);
+    } catch (err) {}
   };
 
-  const updateBudget = (id: string, updates: Partial<Budget>) => {
-    setBudgets(prev =>
-      prev.map(budget =>
-        budget.id === id ? { ...budget, ...updates } : budget
-      )
-    );
+  const updateBudget = async (id: string, updates: Partial<Budget>) => {
+    try {
+      const res = await axios.put(`${BACKEND_URL}/api/budgets/${id}`, updates, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setBudgets((prev) =>
+        prev.map((budget) => (budget.id === id ? res.data : budget))
+      );
+    } catch (err) {}
   };
 
-  const deleteBudget = (id: string) => {
-    setBudgets(prev => prev.filter(budget => budget.id !== id));
+  const deleteBudget = async (id: string) => {
+    try {
+      await axios.delete(`${BACKEND_URL}/api/budgets/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setBudgets((prev) => prev.filter((budget) => budget.id !== id));
+    } catch (err) {}
   };
 
   const sortedTransactions = transactions.sort(
