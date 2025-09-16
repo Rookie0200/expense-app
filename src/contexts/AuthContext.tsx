@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
-const BACKEND_URL = import.meta.env.VITE_API_URL;
+import { authApi, handleApiError } from "../services/api";
+// All API calls now use axios via api.ts
+
 interface User {
   id: string;
   email: string;
@@ -23,82 +24,62 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users database
-// const mockUsers = [
-//   { id: '1', email: 'demo@example.com', password: 'password123', name: 'Demo User' },
-//   { id: '2', email: 'john@example.com', password: 'password123', name: 'John Doe' },
-// ];
+// ...existing code...
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    // Check for stored token on app load
+    const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user_data");
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
       } catch (error) {
-        localStorage.removeItem("auth_token");
+        localStorage.removeItem("token");
         localStorage.removeItem("user_data");
       }
     }
     setIsLoading(false);
   }, []);
 
-  const API_BASE = `${BACKEND_URL}/auth`;
-
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const res = await axios.post(
-        `${API_BASE}/login`,
-        { email, password },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      const data = res.data;
-      localStorage.setItem("auth_token", data.token);
-      localStorage.setItem("user_data", JSON.stringify(data.user));
-      setUser(data.user);
+      const { user: userData, token } = await authApi.login(email, password);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user_data", JSON.stringify(userData));
+      setUser(userData);
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || error.message || "Login failed";
-      throw new Error(message);
+      throw new Error(handleApiError(error));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const signup = async (email: string, password: string, name: string) => {
+  const signup = async (email: string, password: string, firstName: string, lastName:string) => {
     setIsLoading(true);
     try {
-      const res = await axios.post(
-        `${API_BASE}/register`,
-        { name, email, password },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+      const { user: userData, token } = await authApi.signup(
+        email,
+        password,
+        firstName,
+        lastName
       );
-      const data = res.data;
-      localStorage.setItem("auth_token", data.token);
-      localStorage.setItem("user_data", JSON.stringify(data.user));
-      setUser(data.user);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user_data", JSON.stringify(userData));
+      setUser(userData);
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || error.message || "Signup failed";
-      throw new Error(message);
+      throw new Error(handleApiError(error));
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("token");
     localStorage.removeItem("user_data");
     setUser(null);
   };

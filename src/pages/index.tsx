@@ -1,22 +1,29 @@
 import { useState } from "react";
-import { TransactionForm } from "../components/TransactionForm";
-import { TransactionList } from "../components/TransactionList";
-import { MonthlyChart } from "../components/MonthlyChart";
-import { CategoryChart } from "../components/CategoryChart";
-import { Sidebar } from "../components/Sidebar";
-import { DashboardHeader } from "../components/DashboardHeader";
-import { DashboardOverview } from "../components/DashboardOverview";
-import { useTransactions } from "../hooks/useTransaction";
+import { TransactionForm } from "@/components/TransactionForm";
+import { TransactionList } from "@/components/TransactionList";
+import { MonthlyChart } from "@/components/MonthlyChart";
+import { CategoryChart } from "@/components/CategoryChart";
+import { BudgetChart } from "@/components/BudgetChart";
+import { BudgetManager } from "@/components/BudgetManager";
+import { StatsCards } from "@/components/StatsCards";
+import { Sidebar } from "@/components/Sidebar";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { DashboardOverview } from "@/components/DashboardOverview";
+import { useFinancialDataAPI as useTransactions } from "@/hooks/useApiData";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const {
     transactions,
+    budgets,
     loading,
     addTransaction,
     updateTransaction,
     deleteTransaction,
+    addBudget,
+    updateBudget,
+    deleteBudget,
   } = useTransactions();
 
   const renderContent = () => {
@@ -24,13 +31,36 @@ const Index = () => {
       case "dashboard":
         return (
           <div className="space-y-6">
-            <DashboardOverview transactions={transactions} />
+            <DashboardOverview transactions={transactions} budgets={budgets} />
+
             <div className="px-6">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                 <MonthlyChart transactions={transactions} />
                 <CategoryChart transactions={transactions} />
               </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <BudgetChart budgets={budgets} transactions={transactions} />
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Quick Actions
+                  </h3>
+                  <TransactionForm onSubmit={addTransaction} />
+                </div>
+              </div>
             </div>
+          </div>
+        );
+
+      case "analytics":
+        return (
+          <div className="p-6 space-y-6">
+            <StatsCards transactions={transactions} budgets={budgets} />
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <MonthlyChart transactions={transactions} />
+              <CategoryChart transactions={transactions} />
+            </div>
+            <BudgetChart budgets={budgets} transactions={transactions} />
           </div>
         );
 
@@ -49,6 +79,20 @@ const Index = () => {
           </div>
         );
 
+      case "budgets":
+        return (
+          <div className="p-6 space-y-6">
+            <BudgetManager
+              budgets={budgets}
+              transactions={transactions}
+              onAddBudget={addBudget}
+              onUpdateBudget={updateBudget}
+              onDeleteBudget={deleteBudget}
+            />
+            <BudgetChart budgets={budgets} transactions={transactions} />
+          </div>
+        );
+
       default:
         return <div className="p-6">Section not found</div>;
     }
@@ -58,8 +102,12 @@ const Index = () => {
     switch (activeSection) {
       case "dashboard":
         return "Dashboard";
+      case "analytics":
+        return "Analytics";
       case "transactions":
         return "Transactions";
+      case "budgets":
+        return "Budget Manager";
       default:
         return "Dashboard";
     }

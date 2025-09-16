@@ -1,12 +1,7 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -14,8 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../components/ui/table";
-import { Skeleton } from "../components/ui/skeleton";
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,10 +21,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { Trash2, Edit } from "lucide-react";
-import type { Transaction } from "../types/finance";
-import { formatCurrency, formatDate } from "../lib/finance-utils";
+import type { Transaction } from "@/types/finance";
+import { formatCurrency, formatDate } from "@/lib/finance-utils";
 import { TransactionForm } from "./TransactionForm";
 
 interface TransactionListProps {

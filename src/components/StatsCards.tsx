@@ -1,18 +1,13 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ArrowUp, ArrowDown, CircleDollarSign, TrendingUp } from "lucide-react";
-import type { Transaction, Budget } from "../types/finance";
+import type { Transaction, Budget } from "@/types/finance";
 import {
   formatCurrency,
   getCurrentMonth,
   getCategoryData,
   getBudgetVsActual,
-} from "../lib/finance-utils";
+} from "@/lib/finance-utils";
 
 interface StatsCardsProps {
   transactions: Transaction[];
@@ -98,7 +93,7 @@ export const StatsCards = ({ transactions, budgets }: StatsCardsProps) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => {
+        {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card
