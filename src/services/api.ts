@@ -38,7 +38,10 @@ export function handleApiError(error: unknown): string {
 
 // ===================== AUTH =====================
 export const authApi = {
-  async login(email: string, password: string): Promise<{ user: any; token: string }> {
+  async login(
+    email: string,
+    password: string
+  ): Promise<{ user: any; token: string }> {
     const res = await axios.post(
       `${API_BASE_URL}/auth/login`,
       { email, password },
@@ -65,13 +68,19 @@ export const authApi = {
     });
     return res.data;
   },
-  async updateProfile(updates: { name?: string; email?: string }): Promise<any> {
+  async updateProfile(updates: {
+    name?: string;
+    email?: string;
+  }): Promise<any> {
     const res = await axios.put(`${API_BASE_URL}/auth/profile`, updates, {
       headers: getHeaders(),
     });
     return res.data;
   },
-  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
     await axios.post(
       `${API_BASE_URL}/auth/change-password`,
       { currentPassword, newPassword },
@@ -110,23 +119,30 @@ export const transactionsApi = {
   }> {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) query.append(key, String(value));
+      if (value !== undefined && value !== null)
+        query.append(key, String(value));
     });
     const url = `${API_BASE_URL}/transactions${
       query.toString() ? `?${query.toString()}` : ""
     }`;
     const res = await axios.get(url, { headers: getHeaders() });
-    return res.data.transactions;
+    console.log("API - getTransactions response:", res.data);
+    return res.data.data;
   },
   async createTransaction(transaction: Transaction): Promise<any> {
+    console.log("API - Creating transaction:", transaction);
     const res = await axios.post(
       `${API_BASE_URL}/transactions/add`,
-      transaction,
+      { ...transaction },
       { headers: getHeaders() }
     );
+    console.log("API - Created transaction response:", res.data);
     return res.data;
   },
-  async updateTransaction(id: string, updates: Partial<Transaction>): Promise<any> {
+  async updateTransaction(
+    id: string,
+    updates: Partial<Transaction>
+  ): Promise<any> {
     const res = await axios.put(
       `${API_BASE_URL}/transactions/update/${id}`,
       updates,
@@ -139,7 +155,9 @@ export const transactionsApi = {
       headers: getHeaders(),
     });
   },
-  async getTransactionStats(params: { startDate?: string; endDate?: string } = {}): Promise<{
+  async getTransactionStats(
+    params: { startDate?: string; endDate?: string } = {}
+  ): Promise<{
     totalIncome: number;
     totalExpenses: number;
     balance: number;
@@ -156,7 +174,8 @@ export const transactionsApi = {
   }> {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) query.append(key, String(value));
+      if (value !== undefined && value !== null)
+        query.append(key, String(value));
     });
     const url = `${API_BASE_URL}/transactions/stats${
       query.toString() ? `?${query.toString()}` : ""
@@ -182,7 +201,8 @@ export const budgetsApi = {
   async getBudgets(params: BudgetParams = {}): Promise<any[]> {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) query.append(key, String(value));
+      if (value !== undefined && value !== null)
+        query.append(key, String(value));
     });
     const url = `${API_BASE_URL}/budget${
       query.toString() ? `?${query.toString()}` : ""
@@ -191,11 +211,9 @@ export const budgetsApi = {
     return res.data.data.budgets;
   },
   async createBudget(budget: Budget): Promise<any> {
-    const res = await axios.post(
-      `${API_BASE_URL}/budget/add`,
-      budget,
-      { headers: getHeaders() }
-    );
+    const res = await axios.post(`${API_BASE_URL}/budget/add`, budget, {
+      headers: getHeaders(),
+    });
     return res.data;
   },
   async updateBudget(id: string, updates: Partial<Budget>): Promise<any> {
@@ -211,13 +229,15 @@ export const budgetsApi = {
       headers: getHeaders(),
     });
   },
-  async getBudgetVsActual(month?: string): Promise<Array<{
-    category: string;
-    budget: number;
-    actual: number;
-    percentage: number;
-    status: "under" | "over" | "on-track";
-  }>> {
+  async getBudgetVsActual(month?: string): Promise<
+    Array<{
+      category: string;
+      budget: number;
+      actual: number;
+      percentage: number;
+      status: "under" | "over" | "on-track";
+    }>
+  > {
     const url = `${API_BASE_URL}/budget/vs${month ? `?month=${month}` : ""}`;
     const res = await axios.get(url, { headers: getHeaders() });
     return res.data.data;
@@ -250,15 +270,18 @@ export const categoriesApi = {
 
 // ===================== EXPORT =====================
 export const exportApi = {
-  async exportTransactionsCSV(params: {
-    startDate?: string;
-    endDate?: string;
-    category?: string;
-    type?: "income" | "expense";
-  } = {}): Promise<Blob> {
+  async exportTransactionsCSV(
+    params: {
+      startDate?: string;
+      endDate?: string;
+      category?: string;
+      type?: "income" | "expense";
+    } = {}
+  ): Promise<Blob> {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) query.append(key, String(value));
+      if (value !== undefined && value !== null)
+        query.append(key, String(value));
     });
     const url = `${API_BASE_URL}/export/transactions/csv${
       query.toString() ? `?${query.toString()}` : ""
@@ -273,7 +296,9 @@ export const exportApi = {
     return res.data;
   },
   async exportBudgetReportPDF(month?: string): Promise<Blob> {
-    const url = `${API_BASE_URL}/export/budget-report/pdf${month ? `?month=${month}` : ""}`;
+    const url = `${API_BASE_URL}/export/budget-report/pdf${
+      month ? `?month=${month}` : ""
+    }`;
     const token = getAuthToken();
     const res = await axios.get(url, {
       headers: {
@@ -284,4 +309,3 @@ export const exportApi = {
     return res.data;
   },
 };
-

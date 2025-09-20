@@ -131,8 +131,8 @@ export const generateId = (): string => {
 };
 
 export const getCurrentMonth = (): string => {
-  return new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-  });
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
 };
