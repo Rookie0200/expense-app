@@ -108,17 +108,30 @@ export const getBudgetVsActual = (
   // Get budgets for the month
   const monthBudgets = budgets.filter((b) => b.month === month);
 
-  return monthBudgets.map((budget) => {
-    const actual = actualSpending.get(budget.category) || 0;
-    const percentage = budget.amount > 0 ? (actual / budget.amount) * 100 : 0;
+  // Collect all categories from budgets and actual spending
+  const allCategories = new Set<string>();
+  monthBudgets.forEach((b) => allCategories.add(b.category));
+  Array.from(actualSpending.keys()).forEach((c) => allCategories.add(c));
+
+  // Build result for all categories
+  return Array.from(allCategories).map((category) => {
+    const budgetObj = monthBudgets.find((b) => b.category === category);
+    const budget = budgetObj ? budgetObj.amount : 0;
+    const actual = actualSpending.get(category) || 0;
+    const percentage = budget > 0 ? (actual / budget) * 100 : 0;
 
     let status: "under" | "over" | "on-track" = "on-track";
-    if (percentage > 100) status = "over";
-    else if (percentage < 80) status = "under";
+    if (budget === 0) {
+      status = actual > 0 ? "over" : "on-track"; // If no budget, any expense is "over"
+    } else if (percentage > 100) {
+      status = "over";
+    } else if (percentage < 80) {
+      status = "under";
+    }
 
     return {
-      category: budget.category,
-      budget: budget.amount,
+      category,
+      budget,
       actual,
       percentage,
       status,

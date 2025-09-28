@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,7 @@ interface BudgetManagerProps {
   onAddBudget: (budget: Omit<Budget, "id">) => void;
   onUpdateBudget: (id: string, updates: Partial<Budget>) => void;
   onDeleteBudget: (id: string) => void;
+  onMonthChange: (month: string) => void;
 }
 
 export const BudgetManager = ({
@@ -43,6 +44,7 @@ export const BudgetManager = ({
   onAddBudget,
   onUpdateBudget,
   onDeleteBudget,
+  onMonthChange
 }: BudgetManagerProps) => {
   const [open, setOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -55,6 +57,9 @@ export const BudgetManager = ({
   const currentMonth = getCurrentMonth();
   const budgetVsActual = getBudgetVsActual(transactions, budgets, currentMonth);
 
+  useEffect(() => {
+  onMonthChange(formData.month);
+}, [formData.month]);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

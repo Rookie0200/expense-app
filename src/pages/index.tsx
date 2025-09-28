@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionList } from "@/components/TransactionList";
 import { MonthlyChart } from "@/components/MonthlyChart";
@@ -10,8 +10,11 @@ import { Sidebar } from "@/components/Sidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { useFinancialDataAPI as useTransactions } from "@/hooks/useApiData";
+import { getCurrentMonth } from "@/lib/finance-utils";
+
 
 const Index = () => {
+
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const {
@@ -24,7 +27,44 @@ const Index = () => {
     addBudget,
     updateBudget,
     deleteBudget,
+    loadBudgets,
+    loadTransactions,
+    getBudgetVsActual,
   } = useTransactions();
+
+  const [budgetVsActual, setBudgetVsActual] = useState<any[]>([]);
+  const [budgetVsActualLoading, setBudgetVsActualLoading] = useState(false);
+  const [budgetVsActualError, setBudgetVsActualError] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
+
+
+  // Fetch budget vs actual data when switching to Budget Manager or Dashboard
+  useEffect(() => {
+    const fetchBudgetVsActual = async () => {
+      setBudgetVsActualLoading(true);
+      setBudgetVsActualError(null);
+      try {
+        // You can pass a month string if needed, e.g. "2025-09"
+        const data = await getBudgetVsActual(selectedMonth);
+        setBudgetVsActual(data);
+      } catch (err: any) {
+        setBudgetVsActualError(err.message || "Failed to fetch budget vs actual");
+      } finally {
+        setBudgetVsActualLoading(false);
+      }
+    };
+    if (activeSection === "budgets" || activeSection === "dashboard") {
+      fetchBudgetVsActual();
+    }
+  }, [activeSection]);
+
+  // Refetch budgets and transactions when switching to Budget Manager
+  useEffect(() => {
+    if (activeSection === "budgets") {
+      loadBudgets();
+      loadTransactions();
+    }
+  }, [activeSection]);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -40,7 +80,7 @@ const Index = () => {
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <BudgetChart budgets={budgets} transactions={transactions} />
+                <BudgetChart budgets={budgets} transactions={transactions} budgetVsActual={budgetVsActual} loading={budgetVsActualLoading} error={budgetVsActualError} />
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Quick Actions
@@ -60,7 +100,7 @@ const Index = () => {
               <MonthlyChart transactions={transactions} />
               <CategoryChart transactions={transactions} />
             </div>
-            <BudgetChart budgets={budgets} transactions={transactions} />
+            <BudgetChart budgets={budgets} transactions={transactions} budgetVsActual={budgetVsActual} loading={budgetVsActualLoading} error={budgetVsActualError} />
           </div>
         );
 
@@ -88,6 +128,7 @@ const Index = () => {
               onAddBudget={addBudget}
               onUpdateBudget={updateBudget}
               onDeleteBudget={deleteBudget}
+              onMonthChange={setSelectedMonth}
             />
             <BudgetChart budgets={budgets} transactions={transactions} />
           </div>

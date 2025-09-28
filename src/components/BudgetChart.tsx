@@ -19,11 +19,15 @@ import {
 interface BudgetChartProps {
   budgets: Budget[];
   transactions: Transaction[];
+  budgetVsActual?: any[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-export const BudgetChart = ({ budgets, transactions }: BudgetChartProps) => {
+export const BudgetChart = ({ budgets, transactions, budgetVsActual, loading, error }: BudgetChartProps) => {
   const currentMonth = getCurrentMonth();
-  const budgetData = getBudgetVsActual(transactions, budgets, currentMonth);
+  // Use backend data if provided, else fallback to local calculation
+  const budgetData = budgetVsActual !== undefined ? budgetVsActual : getBudgetVsActual(transactions, budgets, currentMonth);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -45,7 +49,44 @@ export const BudgetChart = ({ budgets, transactions }: BudgetChartProps) => {
     return null;
   };
 
-  if (budgetData.length === 0) {
+  if (loading) {
+    return (
+      <Card className="shadow-lg border-0 bg-white/50 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+            Budget vs Actual - {currentMonth}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">⏳</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Loading...</h3>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="shadow-lg border-0 bg-white/50 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+            Budget vs Actual - {currentMonth}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12">
+            <div className="text-red-400 text-6xl mb-4">❌</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Error</h3>
+            <p className="text-gray-500">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!budgetData || budgetData.length === 0) {
     return (
       <Card className="shadow-lg border-0 bg-white/50 backdrop-blur-sm">
         <CardHeader>
