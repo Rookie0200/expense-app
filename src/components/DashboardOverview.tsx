@@ -7,7 +7,7 @@ interface DashboardOverviewProps {
   budgets: Budget[];
 }
 
-export const DashboardOverview = ({ transactions, budgets }: DashboardOverviewProps) => {
+export const DashboardOverview = ({ transactions}: DashboardOverviewProps) => {
   const currentMonth = getCurrentMonth();
   
   const currentMonthTransactions = transactions.filter(t => 
@@ -68,7 +68,7 @@ export const DashboardOverview = ({ transactions, budgets }: DashboardOverviewPr
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        {overviewCards.map((card, index) => (
+        {overviewCards.map((card) => (
           <Card key={card.title} className={`${card.bgColor} border-0 shadow-sm hover:shadow-md transition-shadow duration-200`}>
             <CardContent className="p-6">
               <h3 className={`text-sm font-medium ${card.textColor} opacity-80 mb-2`}>
