@@ -36,6 +36,7 @@ interface BudgetManagerProps {
   onUpdateBudget: (id: string, updates: Partial<Budget>) => void;
   onDeleteBudget: (id: string) => void;
   onMonthChange: (month: string) => void;
+  budgetVsActualData: any[];
 }
 
 export const BudgetManager = ({
@@ -44,7 +45,8 @@ export const BudgetManager = ({
   onAddBudget,
   onUpdateBudget,
   onDeleteBudget,
-  onMonthChange
+  onMonthChange,
+  budgetVsActualData,
 }: BudgetManagerProps) => {
   const [open, setOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -55,11 +57,20 @@ export const BudgetManager = ({
   });
 
   const currentMonth = getCurrentMonth();
-  const budgetVsActual = getBudgetVsActual(transactions, budgets, currentMonth);
+  // const budgetVsActual = getBudgetVsActual(transactions, budgets, currentMonth);
+  const budgetVsActual = (
+    budgetVsActualData ?? getBudgetVsActual(transactions, budgets, currentMonth)
+  ).map((item) => ({
+    category: item.category,
+    budget: item.budgetAmount,
+    actual: item.actualAmount,
+    status: item.status,
+    percentage: item.percentage,
+  }));
 
   useEffect(() => {
-  onMonthChange(formData.month);
-}, [formData.month]);
+    onMonthChange(formData.month);
+  }, [formData.month]);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

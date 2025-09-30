@@ -31,7 +31,7 @@ export const useTransactionsAPI = () => {
       setLoading(true);
       setError(null);
       const response = await transactionsApi.getTransactions(params);
-      console.log("API - Fetched transactions:", response?.transactions);
+      // console.log("API - Fetched transactions:", response?.transactions);
       // Defensive: unwrap and map _id to id for UI compatibility
       const txs = Array.isArray(response?.transactions)
         ? response.transactions.map((tx: any) => ({
@@ -39,7 +39,7 @@ export const useTransactionsAPI = () => {
             id: tx._id || tx.id // ensure id exists
           }))
         : [];
-        console.log("API - Processed transactions:", txs);
+        // console.log("API - Processed transactions:", txs);
       setTransactions(txs);
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to load transactions';

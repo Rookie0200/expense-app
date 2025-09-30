@@ -46,6 +46,7 @@ const Index = () => {
       try {
         // You can pass a month string if needed, e.g. "2025-09"
         const data = await getBudgetVsActual(selectedMonth);
+        console.log("the data of type :", typeof(data))
         setBudgetVsActual(data);
       } catch (err: any) {
         setBudgetVsActualError(err.message || "Failed to fetch budget vs actual");
@@ -57,6 +58,8 @@ const Index = () => {
       fetchBudgetVsActual();
     }
   }, [activeSection]);
+
+  // console.log("the value of budgetvsactual in parent container :",budgetVsActual ," and of type :", typeof(budgetVsActual))
 
   // Refetch budgets and transactions when switching to Budget Manager
   useEffect(() => {
@@ -129,8 +132,9 @@ const Index = () => {
               onUpdateBudget={updateBudget}
               onDeleteBudget={deleteBudget}
               onMonthChange={setSelectedMonth}
+              budgetVsActualData={budgetVsActual}
             />
-            <BudgetChart budgets={budgets} transactions={transactions} />
+            <BudgetChart budgets={budgets} transactions={transactions} budgetVsActual={budgetVsActual} loading={budgetVsActualLoading} error={budgetVsActualError}/>
           </div>
         );
 

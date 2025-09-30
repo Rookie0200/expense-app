@@ -24,10 +24,25 @@ interface BudgetChartProps {
   error?: string | null;
 }
 
-export const BudgetChart = ({ budgets, transactions, budgetVsActual, loading, error }: BudgetChartProps) => {
+export const BudgetChart = ({
+  budgets,
+  transactions,
+  budgetVsActual,
+  loading,
+  error,
+}: BudgetChartProps) => {
   const currentMonth = getCurrentMonth();
   // Use backend data if provided, else fallback to local calculation
-  const budgetData = budgetVsActual !== undefined ? budgetVsActual : getBudgetVsActual(transactions, budgets, currentMonth);
+  // const budgetData = budgetVsActual !== undefined ? budgetVsActual : getBudgetVsActual(transactions, budgets, currentMonth);
+  const budgetData = (
+    budgetVsActual ?? getBudgetVsActual(transactions, budgets, currentMonth)
+  ).map((item) => ({
+    category: item.category,
+    budget: item.budgetAmount,
+    actual: item.actualAmount,
+  }));
+
+  console.log("the budget data in budgetChart is :", budgetData);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -60,7 +75,9 @@ export const BudgetChart = ({ budgets, transactions, budgetVsActual, loading, er
         <CardContent>
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">⏳</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Loading...</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Loading...
+            </h3>
           </div>
         </CardContent>
       </Card>

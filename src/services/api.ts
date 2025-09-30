@@ -126,17 +126,17 @@ export const transactionsApi = {
       query.toString() ? `?${query.toString()}` : ""
     }`;
     const res = await axios.get(url, { headers: getHeaders() });
-    console.log("API - getTransactions response:", res.data);
+    // console.log("API - getTransactions response:", res.data);
     return res.data.data;
   },
   async createTransaction(transaction: Transaction): Promise<any> {
-    console.log("API - Creating transaction:", transaction);
+    // console.log("API - Creating transaction:", transaction);
     const res = await axios.post(
       `${API_BASE_URL}/transactions/add`,
       { ...transaction },
       { headers: getHeaders() }
     );
-    console.log("API - Created transaction response:", res.data);
+    // console.log("API - Created transaction response:", res.data);
     return res.data;
   },
   async updateTransaction(
@@ -240,7 +240,8 @@ export const budgetsApi = {
   > {
     const url = `${API_BASE_URL}/budget/vs${month ? `?month=${month}` : ""}`;
     const res = await axios.get(url, { headers: getHeaders() });
-    return res.data.data;
+    console.log("the res.data.comparison is :", res.data.data.comparison)
+    return res.data.data.comparison;
   },
 };
 
