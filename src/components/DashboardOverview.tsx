@@ -1,60 +1,65 @@
 import { Card, CardContent} from '@/components/ui/card';
-import type { Transaction, Budget } from '@/types/finance';
-import { formatCurrency, getCurrentMonth } from '@/lib/finance-utils';
+// import type { Transaction, Budget } from '@/types/finance';
+import { formatCurrency} from '@/lib/finance-utils';
+import { useDashboardOverview } from '@/hooks/useDashboardOverview';
 
-interface DashboardOverviewProps {
-  transactions: Transaction[];
-  budgets: Budget[];
-}
 
-export const DashboardOverview = ({ transactions}: DashboardOverviewProps) => {
-  const currentMonth = getCurrentMonth();
-  
-  const currentMonthTransactions = transactions.filter(t => 
-    new Date(t.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) === currentMonth
-  );
 
-  const totalIncome = currentMonthTransactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpenses = Math.abs(currentMonthTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0));
-
-  const openingBalance = 5000; // Mock data similar to reference
-  const closingBalance = openingBalance + totalIncome - totalExpenses;
-
-  const overviewCards = [
-    {
-      title: 'Opening Balance',
-      value: openingBalance,
-      subtitle: 'Balance at the beginning of the month',
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
-      textColor: 'text-gray-900 dark:text-white'
-    },
-    {
-      title: 'Total Income',
-      value: totalIncome,
-      subtitle: 'Sum of all incoming funds',
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
-      textColor: 'text-gray-900 dark:text-white'
-    },
-    {
-      title: 'Total Expenses',
-      value: totalExpenses,
-      subtitle: 'Sum of all outgoing funds',
-      bgColor: 'bg-blue-500 dark:bg-blue-600',
-      textColor: 'text-white'
-    },
-    {
-      title: 'Closing Balance',
-      value: closingBalance,
-      subtitle: 'Balance on the last day',
-      bgColor: 'bg-gray-50 dark:bg-gray-800',
-      textColor: 'text-gray-900 dark:text-white'
+export const DashboardOverview = () => {
+    const { data, isLoading, error } = useDashboardOverview(); 
+    
+    // Fallback for loading state
+    if (isLoading) {
+        return (
+            <div className="p-6 text-center">
+                <p>Loading dashboard overview...</p>
+            </div>
+        );
     }
-  ];
+
+    // Fallback for error state
+    if (error) {
+        return (
+            <div className="p-6 text-center text-red-500">
+                <p>Error loading data: {error}</p>
+            </div>
+        );
+    }
+
+    // Deconstruct the fetched data
+    const { openingBalance, totalIncome, totalExpenses, closingBalance } = data;
+
+    const overviewCards = [
+        {
+            title: 'Opening Balance',
+            value: openingBalance,
+            subtitle: 'Balance at the beginning of the month',
+            bgColor: 'bg-gray-50 dark:bg-gray-800',
+            textColor: 'text-gray-900 dark:text-white'
+        },
+        {
+            title: 'Total Income',
+            value: totalIncome,
+            subtitle: 'Sum of all incoming funds',
+            bgColor: 'bg-gray-50 dark:bg-gray-800',
+            textColor: 'text-gray-900 dark:text-white'
+        },
+        {
+            title: 'Total Expenses',
+            value: totalExpenses,
+            subtitle: 'Sum of all outgoing funds',
+            // Highlight expenses based on the provided image
+            bgColor: 'bg-blue-500 dark:bg-blue-600', 
+            textColor: 'text-white'
+        },
+        {
+            title: 'Closing Balance',
+            value: closingBalance,
+            subtitle: 'Balance on the last day',
+            bgColor: 'bg-gray-50 dark:bg-gray-800',
+            textColor: 'text-gray-900 dark:text-white'
+        }
+    ]; 
 
   return (
     <div className="p-6">

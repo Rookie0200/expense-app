@@ -74,7 +74,7 @@ const Index = () => {
       case "dashboard":
         return (
           <div className="space-y-6">
-            <DashboardOverview transactions={transactions} budgets={budgets} />
+            <DashboardOverview />
 
             <div className="px-6">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">

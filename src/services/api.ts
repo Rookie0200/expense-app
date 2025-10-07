@@ -183,6 +183,19 @@ export const transactionsApi = {
     const res = await axios.get(url, { headers: getHeaders() });
     return res.data;
   },
+ async getDashboardOverview(month: string): Promise<{
+        openingBalance: number;
+        totalIncome: number;
+        totalExpenses: number;
+        closingBalance: number;
+    }> {
+        // month is expected in 'YYYY-MM' format
+        const url = `${API_BASE_URL}/transactions/overview?date=${month}`;
+        const res = await axios.get(url, { headers: getHeaders() });
+        return res.data.data;
+    },
+
+
 };
 
 // ===================== BUDGETS =====================
