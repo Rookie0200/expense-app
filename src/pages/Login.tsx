@@ -16,7 +16,7 @@ export default function Login() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  console.log("Current user before login fn ", user);
+  // console.log("Current user before login fn ", user);
 
   // Navigate to dashboard when user is set
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function Login() {
     }
   };
 
-  console.log("Current user after login fn ", user);
+  // console.log("Current user after login fn ", user);
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
@@ -136,7 +136,7 @@ export default function Login() {
             <div className="mt-6 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm font-medium text-muted-foreground mb-2">Demo Credentials:</p>
               <p className="text-xs text-muted-foreground">
-                Email: demo@example.com<br />
+                Email: sudiptech0200@gmail.com<br />
                 Password: password123
               </p>
             </div>
